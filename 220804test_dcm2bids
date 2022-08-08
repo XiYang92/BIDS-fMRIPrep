@@ -1,0 +1,12 @@
+#! /bin/bash
+#SBATCH --partition=short
+#SBATCH --job-name=TestBIDS
+#SBATCH --output=/projects/osl/xiy/log/TestBIDS.out
+#SBATCH --error=/projects/osl/xiy/log/TestBIDS.err
+#SBATCH --time=0-05:00:00
+#SBATCH --nodes=1
+#SBATCH --mem=4000
+#SBATCH --ntasks-per-node=14
+#SBATCH --account=osl
+module load singularity
+singularity run -B /projects/lcni/dcm/osl/Casement/MoDA/MoRa_20220708_110709 -B /projects/osl/xiy/22Mo/bids_data -B /projects/osl/xiy/scripts/dcm2bids /projects/osl/xiy/images/Dcm2Bids-master.simg -d /projects/lcni/dcm/osl/Casement/MoDA/MoRa_20220708_110709 -s 001 -p 000 -c /projects/osl/xiy/scripts/dcm2bids/MoDA_config.json -o /projects/osl/xiy/22Mo/bids_data --forceDcm2niix --clobber
