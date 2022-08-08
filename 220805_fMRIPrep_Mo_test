@@ -1,0 +1,12 @@
+#! /bin/bash
+#SBATCH --partition=fat
+#SBATCH --job-name=fMRIPrep_Mo_test2
+#SBATCH --output=/projects/osl/xiy/log/fMRIPrep_Mo_test2.out
+#SBATCH --error=/projects/osl/xiy/log/fMRIPrep_Mo_test2.err
+#SBATCH --time=1-00:00:00
+#SBATCH --nodes=1
+#SBATCH --mem=400000
+#SBATCH --ntasks-per-node=14
+#SBATCH --account=osl
+module load singularity
+singularity run -e --bind /projects/osl/xiy:/projects/osl/xiy /projects/osl/xiy/images/fmriprep-20.2.3.simg /projects/osl/xiy/22Mo/bids_data /projects/osl/xiy/22Mo/bids_data/derivatives participant --participant_label sub-000 --output-spaces MNI152NLin2009cAsym MNI152NLin6Asym -w /projects/osl/xiy/submit/works --fs-license-file /projects/osl/xiy/license.txt --resource-monitor --notrack --stop-on-first-crash --error-on-aroma-warnings --use-aroma -v
