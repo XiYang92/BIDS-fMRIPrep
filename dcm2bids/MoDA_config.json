@@ -1,0 +1,67 @@
+{
+    "descriptions": [
+        {
+            "dataType": "anat",
+            "modalityLabel": "T1w",
+            "criteria": {
+                "SeriesDescription": "mprage_p2"
+            }
+        },
+        {
+            "dataType": "anat",
+            "modalityLabel": "T2w",
+            "criteria": {
+                "SeriesDescription": "ABCD_T2w_SPC_vNav"
+            }
+        },        
+        {
+            "dataType": "func",
+            "modalityLabel": "bold",
+            "customLabels":"task-MID",
+            "TaskName": "monetaryincentivedelay",
+            "criteria": {
+                "SeriesDescription": "MID_ap"
+            }
+        },
+        {
+            "dataType": "func",
+            "modalityLabel": "bold",
+            "customLabels":"task-SST",
+            "TaskName": "stopsignaltask",
+            "criteria": {
+                "SeriesDescription": "SST_ap"
+            }
+        },
+        {
+            "dataType": "fmap",
+            "modalityLabel": "dir-ap_epi",
+            "criteria": {
+                "SeriesDescription": "se_epi_ap",
+                "EchoTime": 0.0478,
+                "ImageType": "M",
+                "PhaseEncodingDirection": "j-",
+                "TotalReadoutTime": 0.0355346
+            }
+        },
+        {
+            "dataType": "fmap",
+            "modalityLabel": "dir-pa_epi",
+            "criteria": {
+                "SeriesDescription": "se_epi_pa",
+                "EchoTime": 0.0478,
+                "ImageType": "M",
+                "PhaseEncodingDirection": "j",
+                "TotalReadoutTime": 0.0355346
+            }
+        },
+        {
+            "dataType": "func",
+            "modalityLabel":"bold",
+            "customLabels":"task-rest",
+            "TaskName": "resting",
+            "criteria":{
+            "SeriesDescription":"resting_ap"
+            }
+        }
+    ]
+}

@@ -1,0 +1,58 @@
+{
+    "descriptions": [
+        {
+            "dataType": "anat",
+            "modalityLabel": "T1w",
+            "criteria": {
+                "SeriesDescription": "mprage_p2"
+            }
+        },
+        {
+            "dataType": "func",
+            "modalityLabel": "bold",
+            "customLabels":"task-reward",
+            "TaskName": "rewardcardguessing",
+            "criteria": {
+                "SeriesDescription": "Reward"
+            }
+        },
+        {
+            "dataType": "fmap",
+            "modalityLabel": "magnitude1",
+            "criteria": {
+                "SeriesDescription": "fieldmap_2mm",
+                "EchoTime": 0.00437,
+                "ImageType": "M"
+            }
+        },
+        {
+            "dataType": "fmap",
+            "modalityLabel": "magnitude2",
+            "criteria": {
+                "SeriesDescription": "fieldmap_2mm",
+                "EchoTime": 0.00683,
+                "ImageType": "M"
+            }
+        },
+        {
+            "dataType": "fmap",
+            "modalityLabel": "phasediff",
+            "EchoTime1": 0.00437,
+            "EchoTime2": 0.00683,
+            "criteria": {
+                "SeriesDescription": "fieldmap_2mm",
+                "EchoTime": 0.00683,
+                "ImageType": "P"
+            }
+        },
+        {
+            "dataType": "func",
+            "modalityLabel":"bold",
+            "customLabels":"task-rest",
+            "TaskName": "resting",
+            "criteria":{
+            "SeriesDescription":"Resting"
+            }
+        }
+    ]
+}

@@ -1,0 +1,172 @@
+
+Initiated 9/19/18
+Codes derived from github repo of Krista DeStasio
+https://github.com/kdestasio/bidsQC
+Which in turn wrap around
+https://github.com/cbedetti/Dcm2Bids
+N. Long
+
+####
+Yufei shared with OSL Xi Yang on 08/12/21
+Xi Yang & Yufei edited since 08/17/21 to fit OSL SAGE2 fMRI data
+2208014 Xi edited to fit OSL Mo fMRI data
+[]: original notes/comments not pertinent to OSL SAGE2
+####
+
+
+########################################################################################################
+# Mods and updates #
+
+Changes from Krista's Codes (aside from directory locations, which change for all exps)
+- Merged config_dcm2bids_batch and _helper into a single file
+- Modified variable names in dcm2bids_batch so that it referred to bidsdir and not niidir (reduced redundancy)
+- Modified logfile variables so both helper and batch files could be output 
+
+Still to do:
+[ ] not sure if the separate logfile name definitions are necessary. tbd
+[x] empty directories are being created in the scripts dir ... need to remove wherever this is happening. 
+    happened for the helper function only, not going to bother fixing this until my next experiment.
+[x] remove "wave" column from subject_list.txt and test whether script still runs (should...)
+[ ] there are two definitions of the dcm2bids container because of the batch/helper merge, need to reduce to one variable
+#########################################################################################################
+
+# Instructions:
+
+0. Copy the scripts to your own project directory. 
+In my case, under xiy's talapas account (using Globus to transfer the files), xiy-osl-scripts-dcm2bids
+
+[wherever you want your files to live / not in the FREPO dir]
+
+1. set up this file first: (change directory names as needed)
+
+config_dcm2bids.py
+
+2. then run
+
+dcm2bids_helper.py
+
+- Make sure to update embedded sbatch info. Add after --partition=short --account=osl 
+- Use the local terminal connected to talapas, cd to the folder that contains dcm2bids
+- module load python3
+- python3 dcm2bids_helper.py
+- You will notice an empty test subject data folder being created along with some new logs files
+
+This runs dcm2niix on a single subject and generates .json files for each scan run of your experiment
+Takes about 8.5 minutes for FREPO
+The critical thing generated here are the .json files needed for modifying your study's config.json file (see #3 below)
+You need the json info to fill in the fields for #3. This only has to happen once per experiment (assuming things aren't changed)
+
+220804: you can find tmp_dcm2bids under the bidsdir, bids_data
+
+3. modify
+
+*config.json
+
+Recommend starting with an existing file and changing the variables as needed
+
+Json files: double click to view, open with editor to edit  
+Find json templates under bids_data -- tmp_dcm2bids folder (the one created for the test subject)
+Make sure you double check the original dcm header for info, e.g., echo time for phase diff field map
+(module load afni	dicom_hdr)
+Example: https://danieljwilson.com/science/2019/02/18/dicom-bids/
+
+For Mo:
+Refer to MoDA_config.json file for detail
+We used multiple phase encoded directions ("pepolar"); the fieldmap needs to be correctly labeled to have susceptibility distortion correction done in fMRIPrep
+so PhaseEncodingDirection & TotalReadoutTime are required components that need to be updated based on those two files' json:
+https://bids-specification.readthedocs.io/en/stable/04-modality-specific-files/01-magnetic-resonance-imaging-data.html#case-1-phase-difference-map-and-at-least-one-magnitude-image
+https://lcni.uoregon.edu/kb-articles/kb-0003
+example: https://github.com/bids-standard/bids-examples/tree/master/ieeg_visual_multimodal
+
+For SAGE:
+mprage_ND are not distortion corrected. So use mprage for T1w anatomical. 
+Fieldmap: Field map: if no ap or pa, it was acquired with method 1: 1st has two magnitude images (one for each echo) and 2nd is phase diff
+https://lcni.uoregon.edu/kb-articles/kb-0003 
+https://osf.io/k6rm5/wiki/1.1_Field_map_correction/
+1st echo time 4.37
+2nd echo time & phase diff 6.83
+
+Currently have frepo_config.json which has specifications for 
+T1: mprage_ND
+T2: turbo spin echo
+rest: resting state
+task: epi/bold/functional/task runs
+
+frepo_config.json contains all of the mandatory fields
+criteria is the field you're most likely to change because that is experiment/run specific
+the subfields in criteria are in the original json files/are extracted by dcm2niix
+by running the helper function first, you can get all of the necessary info (for my codes it's the SeriesDescription)
+For more detailed info, see: https://github.com/cbedetti/Dcm2Bids
+
+4. create
+
+subject_list.txt
+
+Check original txt to make sure there is no extra lines in the end, if not, there will be errors. 
+
+First col is directory name in the DICOM dir, second col is what you want the subject to be named, 3nd col is session/visit number (a session refers to a visit in SAGE2)
+
+ls /projects/lcni/dcm/lcni/Casement/SAGE/ >> subject_list.txt
+Use an editor (e.g., vi) to delete lines if needed
+
+will get the subj IDs from the DICOMS dir
+if invoked when file already exists, will append
+
+5. run
+
+dcm2bids_batch.py
+
+Partition=long then we don't need to specify the time
+With Mo, usually 3mins for one participant's one session
+
+For SAGE: In the tmp_dcm2bids, you should find 1~5 series for most subjects: Scout *4 and mprage_p2_ND(check the json to make sure it's ND)
+Physio_data *2 not moved yet 
+
+6. run
+
+fmap_intendedfor.py
+
+"B0FieldIdentifier": "pepolar_fmap0"
+This way all echo time info is added to every session file. 
+"Intended for" line will be added to every run's fmap json. If not, fmriprep will not run fmap correction. I changed Yufei's script back to Krista's version because our data structure has multiple sessions. Refer to Yufei's original script for single session scripts.
+
+e.g., with Mo, you will find at the end of fmap's json: "IntendedFor": [
+        "ses-001/func/sub-000_ses-001_task-rest_bold.nii.gz",
+        "ses-001/func/sub-000_ses-001_task-SST_bold.nii.gz",
+        "ses-001/func/sub-000_ses-001_task-MID_bold.nii.gz"
+
+7. add the following jsons for compliance with BIDS
+You can make info included in the jsons as comprehensive as possible.
+To just meet BIDS' requirements, you can refer to SAGE's & MoDA's examples to include minimal info in the jsons.
+
+SAGE: 
+phasediff.json
+dataset_description.json
+task-rest_bold.json
+task-reward_bold.json
+
+Mo:
+dataset_description.json
+task-rest_bold.json
+task-MID_bold.json
+task-SST_bold.json
+
+8. remove unused files
+especially the tmp_dcm2bids/ under the bids_data folder
+shopt -s extglob
+rm -rfv /projects/osl/xiy/bids_data/sub-*/!(*ses*)/
+rm -rfv /projects/osl/xiy/bids_data/tmp_dcm2bids/
+shopt -u extglob
+
+9. BIDS for physio files
+
+As for this step, if you run it before BIDS validator, you need to include a .bidsignore file in the root of the dataset as most physio files (tsv.gz, json etc.) will be marked as BIDS errors. Refer to BIDS notes for creating this file.
+
+You can also run this step after step 10, as fMRIPrep won't use physio files (for now).
+refer to script physiobids, Mo_physioBIDS_test & Mo_physioBIDS (will be finalized once R&D completes).
+6 files (cardiac, respiratory, trigger tsv.gz & json) will be added to each bold scan
+
+10. run
+BIDS validator of your choice. Refer to notes on BIDS validators
+
+11. once the dataset meets BIDS' requirement, proceed with fMRIPrep (refer to fMRIPrep batch job scripts)
