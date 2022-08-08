@@ -1,0 +1,17 @@
+#! /bin/bash
+#SBATCH --partition=short
+#SBATCH --job-name=Mo_physioBIDS_test
+#SBATCH --output=/projects/osl/xiy/log/Mo_physioBIDS_test.out
+#SBATCH --error=/projects/osl/xiy/log/Mo_physioBIDS_test.err
+#SBATCH --time=0-01:00:00
+#SBATCH --nodes=1
+#SBATCH --mem=4000
+#SBATCH --ntasks-per-node=14
+#SBATCH --account=osl
+
+dcm2bidsphysio --infile /projects/lcni/dcm/osl/Casement/MoDA/MoRa_20220708_110709/*MID_ap_PhysioLog/*.dcm --bidsprefix /projects/osl/xiy/22Mo/bids_data/sub-000/ses-001/func/sub-000-ses-001_task-MID
+
+dcm2bidsphysio --infile /projects/lcni/dcm/osl/Casement/MoDA/MoRa_20220708_110709/*SST_ap_PhysioLog/*.dcm --bidsprefix /projects/osl/xiy/22Mo/bids_data/sub-000/ses-001/func/sub-000-ses-001_task-SST
+
+dcm2bidsphysio --infile /projects/lcni/dcm/osl/Casement/MoDA/MoRa_20220708_110709/*resting_ap_PhysioLog/*.dcm --bidsprefix /projects/osl/xiy/22Mo/bids_data/sub-000/ses-001/func/sub-000-ses-001_task-rest
+
