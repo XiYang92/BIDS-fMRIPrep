@@ -1,0 +1,17 @@
+#! /bin/bash
+#SBATCH --partition=short
+#SBATCH --job-name=PhysioBIDS
+#SBATCH --output=/projects/osl/xiy/log/PhysioBIDS.out
+#SBATCH --error=/projects/osl/xiy/log/PhysioBIDS.err
+#SBATCH --time=0-05:00:00
+#SBATCH --nodes=1
+#SBATCH --mem=4000
+#SBATCH --ntasks-per-node=14
+#SBATCH --account=osl
+subjl=$(cat /projects/osl/xiy/submit/subject_list.txt)
+for n in $subjl; do
+  file=$(echo $n | cut -d "," -f 1)
+  subj=$(echo $n | cut -d "," -f 2)
+  session=$(echo $n | cut -d "," -f 3)
+  dcm2bidsphysio --infile /projects/osl/xiy/data/210817SAGE2Data/sourcedata/${file}/*Reward_PhysioLog/*.dcm --bidsprefix /projects/osl/xiy/data/210817SAGE2Data/bids_data/${subj}/${session}/func/${subj}_${session}_task-reward
+done
